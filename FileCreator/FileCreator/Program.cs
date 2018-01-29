@@ -7,29 +7,34 @@ namespace FileCreator
     {
         static void Main(string[] args)
         {
-            const string defaultDirectory = @"cd:\Generated Files";
             const int bytesInMegabytes = 1048576;
 
             Console.WriteLine("How many files would you like to create?");
-            var totalFilesToCreate = int.Parse(Console.ReadLine());
+            var inputFileCount = Console.ReadLine();
+            var totalFilesToCreate = int.Parse(string.IsNullOrWhiteSpace(inputFileCount) ?  "1" : inputFileCount);
 
             Console.WriteLine("What size (MBs) do you want the files to be?");
-            var size = double.Parse(Console.ReadLine()) * bytesInMegabytes;
+            var inputFileSize = Console.ReadLine();
+
+            var size = double.Parse(string.IsNullOrWhiteSpace(inputFileSize) ? "1" : inputFileSize) * bytesInMegabytes;
 
             Console.WriteLine("What File Name would you like these files to be called?");
             var fileName = Console.ReadLine();
 
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = "cmd.exe";
-            cmd.StartInfo.RedirectStandardInput = true;
-            cmd.StartInfo.RedirectStandardOutput = true;
-            cmd.StartInfo.CreateNoWindow = false;
-            cmd.StartInfo.UseShellExecute = false;
+            var cmd = new Process
+            {
+                StartInfo =
+                {
+                    FileName = "cmd.exe",
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = false,
+                    UseShellExecute = false
+                }
+            };
             cmd.Start();
 
-            cmd.StandardInput.WriteLine(defaultDirectory);
-
-            for (var i = 0; i <= totalFilesToCreate; i++)
+            for (var i = 1; i <= totalFilesToCreate; i++)
             {
                 cmd.StandardInput.WriteLine($"fsutil file createnew {fileName + i}.txt {size}");
                 cmd.StandardInput.Flush();
